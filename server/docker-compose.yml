@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  node:
+    image: node:16
+    volumes:
+      - "./api:/var/www"
+    ports:
+      - "8081:3000"
+    links:
+      - mongo
+    command: bash -c "cd /var/www && ./node_modules/.bin/pm2 start startup.json --name API --no-daemon"
+    environment:
+      - URL_MONGO=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo
+      - SECRET_KEY=${SECRET_KEY}
+
+  mongo:
+    image: mongo:4.0
+    volumes:
+      - "./mongo/data:/data/db"
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
